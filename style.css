@@ -1,0 +1,174 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;  
+    font-family: 'Segoe UI', sans-serif;
+    color: #000000;
+}
+#home {
+    margin-left: auto;
+    margin-right: 10px;
+    color: #ffffff;
+    font-size: medium;
+}
+#startScreen * {
+    position: relative;
+    z-index: 1;
+}
+#startScreen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);  
+    z-index: 0;
+}
+#startScreen {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: url("/static/icons/4.jpg") no-repeat center center/cover;
+    position: relative;
+}
+#startScreen h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 25px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+#startScreen button {
+    padding: 15px 35px;
+    font-size: 18px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    transition: 0.3s;
+}
+#startScreen button:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+.topbar {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    font-size: 20px;
+    color: #f2d9d9;
+    font-weight: bold;
+}
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: url("/static/icons/5.jpg") no-repeat center center/cover;
+    position: relative;
+}
+.dashboard {
+    display: flex;
+    height: 75%;   
+    gap: 10px;
+    transition: 0.3s;
+}
+.camera-panel, .info-panel {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border-radius: 15px;
+    padding: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+.camera-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.camera-panel img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;   
+    background: black;
+}
+.info-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.info-panel > * {
+    margin-bottom: 8px;
+}
+#gesture {
+    font-size: 25px;
+    font-weight: bold;
+    color: #ffffff;
+}
+#sentenceBox {
+    min-height: 40px;
+    max-height: 60px;
+    overflow: hidden;
+    font-size: 25px;
+    color: #ffffff;
+    font-weight: bold;
+}
+h3 {
+    margin: 5px 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+#hindiTranslation {
+    font-size: 25px; 
+    color: #ffffff; 
+    font-weight: bold;
+}
+#suggestionBox {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+.suggestion {
+    background: #ffffff;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: black;
+    font-weight: bold;
+}
+.suggestion:hover {
+    background: #8ea1a8;
+}
+.buttons {
+    height: 15%;   
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+button {
+    padding: 12px 17px;
+    margin: 7px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4b0606, #551414);
+    color: rgb(255, 255, 255);
+    transition: 0.2s;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: larger;
+}
+button:hover {
+    background: #311414;
+    transform: scale(1.05);
+}

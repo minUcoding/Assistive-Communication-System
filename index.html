@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sign Language Recognition</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div id="startScreen">
+    <h1>Assistive Communication System</h1>
+    <button onclick="startSystem()">Start System</button>
+</div>
+<div class="container" style="display:none;">
+    <div class="topbar">
+        <span>🗺 Assistive Communication System</span>
+        <button id="home" onclick="gohome()"> Home</button>
+    </div>
+    <div class="dashboard">
+        <div class="camera-panel">
+            <img src="{{ url_for('video') }}">
+        </div>
+        <div class="info-panel">
+            <h3>Detected Gesture</h3>
+            <div id="gesture">None</div>
+            <h3>Sentence</h3>
+            <div id="sentenceBox"></div>
+            <h3>Translation (Hindi)</h3>
+            <div id="hindiTranslation">--</div>
+            <h3>Suggestions</h3>
+            <div id="suggestionBox"></div>
+        </div>
+    </div>
+    <div class="buttons">
+        <button id="powerBtn" onclick="toggleSystem()">⏻</button>
+        <button onclick="confirmLetter()">Add Letter</button>
+        <button onclick="addSpace()">Space</button> <button onclick="speakSentence()">🔊</button>
+        <button onclick="clearSentence()">🗑️</button>
+        <button onclick="startListening()">🗣</button>
+        <button onclick="stopListening()">🔇</button>
+    </div>
+</div>
+<script>
+window.voiceMode = false;
+let detectedletter = "";
+let sentence = "";
+let recognition;
+let isListening = false;
+let systemOn = true;
+
+function startListening() {
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-US";
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    isListening = true;
+    window.voiceMode = true;
+    document.getElementById("sentenceBox").innerText = "Listening...";
+    recognition.onresult = function(event) {
+        let text = event.results[event.results.length - 1][0].transcript;
+        document.getElementById("sentenceBox").innerText = text;
+    };
+    recognition.start();
+}
+
+function toggleSystem(){
+    fetch("/toggle_camera")
+    .then(res=>res.json())
+    .then(data=>{
+        systemOn = data.status;
+        if(systemOn){
+            document.querySelector(".dashboard").style.opacity = "1";
+            document.getElementById("sentenceBox").innerText = "";
+            document.getElementById("powerBtn").innerText = "⏸";
+        } else {
+            document.querySelector(".dashboard").style.opacity = "0.3";
+            document.getElementById("sentenceBox").innerText = "System Paused";
+            document.getElementById("powerBtn").innerText = "▶";
+        }
+    })
+}
+
+function stopListening() {
+    if(recognition && isListening){
+        recognition.stop();
+    }
+    isListening = false;
+    window.voiceMode = true;  
+}
+
+function loadSuggestions(){
+    fetch("/suggestions")
+    .then(res=>res.json())
+    .then(data=>{
+        let box=document.getElementById("suggestionBox")
+        box.innerHTML=""
+        data.suggestions.forEach(word=>{
+            let div=document.createElement("div")
+            div.className="suggestion"
+            div.innerText=word
+            div.onclick=function(){
+                fetch("/add/" + word)
+                .then(res=>res.json())
+                .then(data=>{
+                    document.getElementById("sentenceBox").innerText = data.sentence
+                })
+            }
+            box.appendChild(div)
+        })
+    })
+}
+
+function confirmLetter(){
+    let letter=document.getElementById("gesture").innerText
+    fetch("/add_letter/"+letter)
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById("sentenceBox").innerText=data.word
+        loadSuggestions()
+    })
+}
+
+function updateGesture(){
+    if(!systemOn) return;
+    fetch("/gesture")
+    .then(res=>res.json())
+    .then(data=>{
+        let gesture = data.gesture || "None";
+        let word = data.word || "";
+        let hindi = data.hindi || "";
+        document.getElementById("gesture").innerText = gesture
+        document.getElementById("hindiTranslation").innerText = hindi
+        if(word){
+            document.getElementById("sentenceBox").innerText = word
+        }
+loadSuggestions()
+})
+}
+
+setInterval(updateGesture,800)
+
+function addWord(){
+    let g = document.getElementById("gesture").innerText
+    if(g && g !== "None" && g !== ""){
+        fetch("/add/" + g)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("sentenceBox").innerText = data.word
+        })
+    }
+}
+
+function speakSentence(){
+    let text = document.getElementById("sentenceBox").innerText;
+    if(!text || text.trim() === "" || text === "System Paused"){
+        alert("No sentence to speak");
+        return;
+    }
+    let cleanText = text.replace(/\s+/g, ' ').trim();
+    let speech = new SpeechSynthesisUtterance(cleanText);
+    speech.lang = "en-US";
+    speech.rate = 0.9; 
+    window.speechSynthesis.cancel(); 
+    window.speechSynthesis.speak(speech);
+}
+
+function clearSentence(){
+    fetch("/clear")
+    .then(res => res.json())
+    .then(data=>{
+        document.getElementById("sentenceBox").innerText = ""
+        document.getElementById("historyBox").innerHTML = ""
+window.voiceMode = false; 
+})
+}
+
+function speakText() {
+    let text = document.getElementById("userInput").value;
+    fetch(`/speak/${text}`);
+}
+document.addEventListener("keydown",function(e){
+    if(e.key==="Enter"){
+        speakSentence()
+    }
+})
+
+function startSystem(){
+    document.getElementById("startScreen").style.display = "none";
+    document.querySelector(".container").style.display = "block";
+    if(!systemOn){
+        fetch("/toggle_camera")
+        .then(res=>res.json())
+        .then(data=>{
+            systemOn = data.status;
+        });
+    }
+}
+
+function gohome(){
+    fetch("/camera_off")
+    .then(res=>res.json())
+    .then(data=>{
+        systemOn = false;
+        document.getElementById("startScreen").style.display = "flex";
+        document.querySelector(".container").style.display = "none";
+    });
+}
+
+function addSpace() {
+    fetch("/add_letter/SPACE")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("sentenceBox").innerText = data.word;
+    });
+}
+</script>
+</body>
+</html>
