@@ -32,7 +32,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: url("/static/icons/4.jpg") no-repeat center center/cover;
+    background: url("4.jpg") no-repeat center center/cover;
     position: relative;
 }
 #startScreen h1 {
@@ -74,7 +74,7 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    background: url("/static/icons/5.jpg") no-repeat center center/cover;
+    background: url("5.jpg") no-repeat center center/cover;
     position: relative;
 }
 .dashboard {
